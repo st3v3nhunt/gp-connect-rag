@@ -47,8 +47,11 @@ Always let the user know when you didn't find the answer in the documentation or
 """
 # Then also always check the list of available documentation pages and retrieve the content of page(s) if it'll help.
 
-gp_connect_expert = Agent(
-    model, system_prompt=SYSTEM_PROMPT, deps_type=PydanticAIDeps, retries=2
+gp_connect_agent = Agent(
+    model,
+    system_prompt=SYSTEM_PROMPT,
+    deps_type=PydanticAIDeps,
+    retries=2,
 )
 
 
@@ -64,7 +67,7 @@ async def get_embedding(text: str, openai_client: AsyncOpenAI) -> List[float]:
         return [0] * 1536  # Return zero vector on error
 
 
-@gp_connect_expert.tool
+@gp_connect_agent.tool
 async def retrieve_relevant_documentation(
     ctx: RunContext[PydanticAIDeps], user_query: str
 ) -> str:
@@ -87,7 +90,7 @@ async def retrieve_relevant_documentation(
             "match_site_pages",
             {
                 "query_embedding": query_embedding,
-                "match_count": 3,
+                "match_count": 1,
                 "filter": {"source": "gpconnect-1-6-0"},
             },
         ).execute()
@@ -95,7 +98,7 @@ async def retrieve_relevant_documentation(
         if not result.data:
             return "No relevant documentation found."
 
-        # print(f"Result length: {len(result.data)}.\nResult: {result.data}")
+        print(f"Result length: {len(result.data)}.\nResult: {result.data}")
         # Combine the pages
         formatted_chunks = []
         for doc in result.data:
@@ -116,7 +119,7 @@ async def retrieve_relevant_documentation(
         return f"Error retrieving documentation: {str(e)}"
 
 
-# @gp_connect_expert.tool
+# @gp_connect_agent.tool
 # async def list_documentation_pages(ctx: RunContext[PydanticAIDeps]) -> List[str]:
 #     """
 #     Retrieve a list of all available GP Connect documentation pages.
@@ -145,7 +148,7 @@ async def retrieve_relevant_documentation(
 #         return []
 
 
-# @gp_connect_expert.tool
+# @gp_connect_agent.tool
 # async def get_page_content(ctx: RunContext[PydanticAIDeps], url: str) -> str:
 #     """
 #     Retrieve the full content of a specific documentation page by combining all its chunks.

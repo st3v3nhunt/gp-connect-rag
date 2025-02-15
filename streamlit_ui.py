@@ -26,7 +26,7 @@ from pydantic_ai.messages import (
     RetryPromptPart,
     ModelMessagesTypeAdapter,
 )
-from gp_connect_expert import gp_connect_expert, PydanticAIDeps
+from gp_connect_agent import gp_connect_agent, PydanticAIDeps
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -79,7 +79,7 @@ async def run_agent_with_streaming(user_input: str):
     message_placeholder = st.empty()
     message_placeholder.status("Searching for answer...")
     # Run the agent in a stream
-    async with gp_connect_expert.run_stream(
+    async with gp_connect_agent.run_stream(
         user_input,
         deps=deps,
         # pass entire conversation so far
