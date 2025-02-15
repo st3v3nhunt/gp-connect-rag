@@ -90,7 +90,7 @@ async def retrieve_relevant_documentation(
             "match_site_pages",
             {
                 "query_embedding": query_embedding,
-                "match_count": 1,
+                "match_count": 3,
                 "filter": {"source": "gpconnect-1-6-0"},
             },
         ).execute()
