@@ -4,6 +4,7 @@ Pydantic AI agent for GP Connect expert.
 
 from __future__ import annotations as _annotations
 from typing import List
+
 # import asyncio
 import os
 

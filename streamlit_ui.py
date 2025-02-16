@@ -110,25 +110,40 @@ async def run_agent_with_streaming(user_input: str):
         st.session_state.messages.append(
             ModelResponse(parts=[TextPart(content=partial_text)])
         )
-        print(f"messages: {st.session_state.messages}")
+
+
+def is_password_invalid(password: str) -> bool:
+    """Check if the password is invalid."""
+    return password != os.getenv("PASSWORD")
 
 
 async def main():
     """Main function to run the Streamlit UI."""
     st.set_page_config(page_title="🔎 GP Connect Chat", page_icon="🏥")
     st.title("🔎 GP Connect Chat")
-    st.write("Ask a question about GP Connect Access Record Structured")
+    st.write("Chat about GP Connect Access Record Structured")
     with st.sidebar:
         password = st.text_input("Password", type="password", key="password")
         """
         Quick links:
         - [GP Connect](https://digital.nhs.uk/services/gp-connect)
         - [GP Connect 1.6.0](https://developer.nhs.uk/apis/gpconnect-1-6-0/)
+
+        [View the source code](https://github.com/st3v3nhunt/gp-connect-rag/blob/main/streamlit_ui.py)
         """
+
+    # Make it clear the password is required, stop rendering the UI if not
+    # valid, prevents further checks
+    if is_password_invalid(password):
+        st.error("Please enter the password to continue.")
+        st.stop()
 
     # Initialize chat history in session state if not present
     if "messages" not in st.session_state:
         st.session_state.messages = []
+        st.session_state.messages.append(
+            ModelResponse(parts=[TextPart(content="Hi! How can I help you?")])
+        )
 
     # Display all messages from the conversation so far
     # Each message is either a ModelRequest or ModelResponse.
@@ -140,12 +155,6 @@ async def main():
 
     # Chat input for the user
     if user_input := st.chat_input("Ask a question about GP Connect"):
-        if not password:
-            st.error("A password is required to continue.")
-            st.stop()
-        if password != os.getenv("PASSWORD"):
-            st.error("Please enter the correct password to continue.")
-            st.stop()
         # We append a new request to the conversation explicitly
         st.session_state.messages.append(
             ModelRequest(parts=[UserPromptPart(content=user_input)])
