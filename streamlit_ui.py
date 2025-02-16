@@ -117,8 +117,9 @@ async def main():
     """Main function to run the Streamlit UI."""
     st.set_page_config(page_title="🔎 GP Connect Chat", page_icon="🏥")
     st.title("🔎 GP Connect Chat")
-    st.write("Ask any question about GP Connect Access Record Structured")
+    st.write("Ask a question about GP Connect Access Record Structured")
     with st.sidebar:
+        password = st.text_input("Password", type="password", key="password")
         """
         Quick links:
         - [GP Connect](https://digital.nhs.uk/services/gp-connect)
@@ -138,9 +139,13 @@ async def main():
                 display_message_part(part)
 
     # Chat input for the user
-    if user_input := st.chat_input(
-        "What would like to find out about GP Connect Access Record Structured?"
-    ):
+    if user_input := st.chat_input("Ask a question about GP Connect"):
+        if not password:
+            st.error("A password is required to continue.")
+            st.stop()
+        if password != os.getenv("PASSWORD"):
+            st.error("Please enter the correct password to continue.")
+            st.stop()
         # We append a new request to the conversation explicitly
         st.session_state.messages.append(
             ModelRequest(parts=[UserPromptPart(content=user_input)])

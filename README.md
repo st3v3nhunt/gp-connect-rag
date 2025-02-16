@@ -14,8 +14,14 @@ source .venv/bin/activate
 pip install -r requirements
 ```
 
-Populate env vars. Using the `.env.example` file as a template, create a `.env` file and populate the values of the
-listed variables.
+Setup the environment variables. Using the `.env.example` file as a template, create a `.env` file and populate the
+values of the listed variables.
+
+- `OpenAI` API keys can be obtained from [OpenAI](https://platform.openai.com/api-keys).
+- `SUPABASE_*` API keys can be obtained from the project page in
+  [Supabase](https://supabase.com/dashboard/project/_/settings/api).
+- `PASSWORD` should be set to a strong password/passphrase for when (if) the application is deployed and use of the
+  model wants to be retricted.
 
 ### Database setup
 
@@ -27,7 +33,7 @@ Create a new project in Supabase. Run the `site_pages.sql` script, it will:
 
 In Supabase, do this by going to the "SQL Editor" tab and pasting in the SQL into the editor there. Then click "Run".
 
-### Crawler
+### Crawler, data processing and storage
 
 Run:
 
