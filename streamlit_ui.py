@@ -76,6 +76,7 @@ async def run_agent_with_streaming(user_input: str):
     # Prepare dependencies
     deps = PydanticAIDeps(supabase=supabase, openai_client=openai_client)
 
+    # Clear placeholder and indicate that we're searching
     message_placeholder = st.empty()
     message_placeholder.status("Searching for answer...")
     # Run the agent in a stream
@@ -87,7 +88,6 @@ async def run_agent_with_streaming(user_input: str):
     ) as result:
         # We'll gather partial text to show incrementally
         partial_text = ""
-        # message_placeholder = st.empty()
 
         # Render partial text as it arrives
         async for chunk in result.stream_text(delta=True):
@@ -110,6 +110,7 @@ async def run_agent_with_streaming(user_input: str):
         st.session_state.messages.append(
             ModelResponse(parts=[TextPart(content=partial_text)])
         )
+        print(f"messages: {st.session_state.messages}")
 
 
 async def main():
@@ -137,11 +138,9 @@ async def main():
                 display_message_part(part)
 
     # Chat input for the user
-    user_input = st.chat_input(
-        "What questions do you have about GP Connect Access Record Structured?"
-    )
-
-    if user_input:
+    if user_input := st.chat_input(
+        "What would like to find out about GP Connect Access Record Structured?"
+    ):
         # We append a new request to the conversation explicitly
         st.session_state.messages.append(
             ModelRequest(parts=[UserPromptPart(content=user_input)])

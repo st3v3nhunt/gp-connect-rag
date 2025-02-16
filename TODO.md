@@ -12,6 +12,7 @@
 
 ## Future work
 
+- [ ] Include links to the page in message response to user
 - [ ] Add logging
 - [ ] Handle errors, general non-happy path stuff
   - [ ] Context length of content is too large to create embedding for
