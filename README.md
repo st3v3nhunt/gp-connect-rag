@@ -55,4 +55,4 @@ Run:
 streamlit run streamlit_ui.py
 ```
 
-This will, create a web interface for the RAG system on `http://localhost:8501`.
+This will, create a web interface for the RAG system on [http://localhost:8501](http://localhost:8501).

@@ -12,6 +12,7 @@
 
 ## Future work
 
+- [ ] Deploy to Streamlit cloud
 - [ ] Include links to the page in message response to user
 - [ ] Add logging
 - [ ] Handle errors, general non-happy path stuff
