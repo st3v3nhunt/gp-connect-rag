@@ -16,5 +16,6 @@ Return the content.
 ## Questions
 
 - Why is the request to embedding changing the user query? Is it possible to prevent that from happening?
-  - The user_query is being changed by the LLM before is makes the request. Change the prompt doesn't seem to make a
-    difference.
+  - The user_query is being changed by the LLM before is makes the request. Changing the prompt doesn't seem to make a
+    difference. It is possible to use the raw user entered text via `ctx.prompt` but this might not be the best
+    approach. It removes some of the benefit of having the LLM create the question.

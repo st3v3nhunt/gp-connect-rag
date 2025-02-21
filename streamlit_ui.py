@@ -37,7 +37,8 @@ openai_client = AsyncOpenAI()
 supabase: Client = Client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY"))
 
 # Configure logfire to suppress warnings (optional)
-logfire.configure(send_to_logfire="never")
+logfire.configure()
+logfire.instrument_httpx(capture_all=True)
 
 
 class ChatMessage(TypedDict):

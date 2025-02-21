@@ -10,11 +10,11 @@ import os
 
 from dataclasses import dataclass
 from dotenv import load_dotenv
-import logfire
 import httpx
 
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIModel
+# from pydantic_ai.models.gemini import GeminiModel
 from openai import AsyncOpenAI
 from supabase import Client
 
@@ -22,10 +22,7 @@ load_dotenv()
 
 llm = os.getenv("LLM_MODEL", "gpt-4o-mini")
 model = OpenAIModel(llm)
-
-logfire.configure()
-logfire.instrument_httpx(capture_all=True)
-
+# model = GeminiModel('gemini-2.0-flash')
 
 @dataclass
 class PydanticAIDeps:
@@ -50,7 +47,8 @@ When you first look at the documentation, always start with RAG.
 
 Always let the user know when you didn't find the answer in the documentation or the right URL - be honest.
 """
-# Then also always check the list of available documentation pages and retrieve the content of page(s) if it'll help.
+# Then also always check the list of available documentation pages and retrieve
+# the content of page(s) if it'll help.
 
 gp_connect_agent = Agent(
     model,
@@ -60,12 +58,12 @@ gp_connect_agent = Agent(
 )
 
 
-async def get_embedding(text: str, openai_client: AsyncOpenAI) -> List[float]:
+async def get_embedding(user_query: str, openai_client: AsyncOpenAI) -> List[float]:
     """Get embedding vector from OpenAI."""
     try:
-        print(f"Getting embedding for: {text}")
+        print(f"Getting embedding for: {user_query}")
         response = await openai_client.embeddings.create(
-            model="text-embedding-3-small", input=text
+            model="text-embedding-3-small", input=user_query
         )
         # print(f"Embedding response: {response}")
         return response.data[0].embedding
@@ -79,11 +77,11 @@ async def retrieve_relevant_documentation(
     ctx: RunContext[PydanticAIDeps], user_query: str
 ) -> str:
     """
-    Retrieve relevant documentation pages based on the user's, unaltered query.
+    Retrieve relevant documentation pages based on the user's query.
 
     Args:
         ctx: The context including the Supabase client and OpenAI client
-        user_query: The user's question or query
+        user_query: The user's query
 
     Returns:
         A formatted string containing the top 3 most relevant documentation pages
@@ -92,6 +90,8 @@ async def retrieve_relevant_documentation(
         # Get the embedding for the query
         # TODO: The value of the user query is being altered before it goes to
         # get the embedding which is causing inconsistent results
+        print(f"user_query: {user_query}")
+        print(f"ctx.prompt: {ctx.prompt}")
         query_embedding = await get_embedding(user_query, ctx.deps.openai_client)
 
         # Query Supabase for relevant documents
