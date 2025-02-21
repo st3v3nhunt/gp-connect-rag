@@ -12,9 +12,11 @@
 
 ## Future work
 
-- [ ] Deploy to Streamlit cloud
+- [X] Deploy to Streamlit cloud
+- [X] Add logfire logging
+- [ ] Figure out why the first request to completions is returning an exception. Looks like it is because the event loop
+  has been closed - why is this happening?
 - [ ] Include links to the page in message response to user
-- [ ] Add logging
 - [ ] Handle errors, general non-happy path stuff
   - [ ] Context length of content is too large to create embedding for
     [FHIR implementation](https://developer.nhs.uk/apis/gpconnect-1-6-0/development_fhir_api_guidance.html) and

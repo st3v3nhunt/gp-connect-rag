@@ -11,4 +11,10 @@ writing, neither the pruning or BM25 content filtering techniques are suitable t
 Need to take the question in from the user.
 Get the embedding of the question.
 Compare the embedding of the question to the embeddings in the DB.
-Return the content
+Return the content.
+
+## Questions
+
+- Why is the request to embedding changing the user query? Is it possible to prevent that from happening?
+  - The user_query is being changed by the LLM before is makes the request. Change the prompt doesn't seem to make a
+    difference.

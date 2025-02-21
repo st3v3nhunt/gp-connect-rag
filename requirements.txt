@@ -3,6 +3,7 @@ langchain-core
 langchain-community
 langgraph
 logfire
+logfire[httpx]
 openai
 pydantic-ai
 streamlit

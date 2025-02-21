@@ -141,9 +141,9 @@ async def main():
     # Initialize chat history in session state if not present
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        st.session_state.messages.append(
-            ModelResponse(parts=[TextPart(content="Hi! How can I help you?")])
-        )
+        # st.session_state.messages.append(
+        #     ModelResponse(parts=[TextPart(content="Hi! How can I help you?")])
+        # )
 
     # Display all messages from the conversation so far
     # Each message is either a ModelRequest or ModelResponse.

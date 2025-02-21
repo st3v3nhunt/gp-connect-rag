@@ -23,7 +23,8 @@ load_dotenv()
 llm = os.getenv("LLM_MODEL", "gpt-4o-mini")
 model = OpenAIModel(llm)
 
-logfire.configure(send_to_logfire="if-token-present")
+logfire.configure()
+logfire.instrument_httpx(capture_all=True)
 
 
 @dataclass
@@ -38,6 +39,9 @@ patient's GP records. You have access to the documentation including examples, a
 help you answer questions about the service and standards.
 
 Your only job is to assist with this and you don't answer other questions besides describing what you are able to do.
+
+Include additional information or context to the user's query when calling
+tools, if you think it would help return relevant documentation.
 
 Don't ask the user before taking an action, just do it. Always make sure you look at the documentation with the provided
 tools before answering the user's question unless you have already.
@@ -59,9 +63,11 @@ gp_connect_agent = Agent(
 async def get_embedding(text: str, openai_client: AsyncOpenAI) -> List[float]:
     """Get embedding vector from OpenAI."""
     try:
+        print(f"Getting embedding for: {text}")
         response = await openai_client.embeddings.create(
             model="text-embedding-3-small", input=text
         )
+        # print(f"Embedding response: {response}")
         return response.data[0].embedding
     except Exception as e:
         print(f"Error getting embedding: {e}")
@@ -73,7 +79,7 @@ async def retrieve_relevant_documentation(
     ctx: RunContext[PydanticAIDeps], user_query: str
 ) -> str:
     """
-    Retrieve relevant documentation pages based on the query with RAG.
+    Retrieve relevant documentation pages based on the user's, unaltered query.
 
     Args:
         ctx: The context including the Supabase client and OpenAI client
@@ -84,6 +90,8 @@ async def retrieve_relevant_documentation(
     """
     try:
         # Get the embedding for the query
+        # TODO: The value of the user query is being altered before it goes to
+        # get the embedding which is causing inconsistent results
         query_embedding = await get_embedding(user_query, ctx.deps.openai_client)
 
         # Query Supabase for relevant documents
@@ -96,10 +104,11 @@ async def retrieve_relevant_documentation(
             },
         ).execute()
 
+        print(f"Result length: {len(result.data)}.\nResult: {result.data}")
+
         if not result.data:
             return "No relevant documentation found."
 
-        print(f"Result length: {len(result.data)}.\nResult: {result.data}")
         # Combine the pages
         formatted_chunks = []
         for doc in result.data:
