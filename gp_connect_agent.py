@@ -14,6 +14,7 @@ import httpx
 
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.openai import OpenAIModel
+
 # from pydantic_ai.models.gemini import GeminiModel
 from openai import AsyncOpenAI
 from supabase import Client
@@ -23,6 +24,7 @@ load_dotenv()
 llm = os.getenv("LLM_MODEL", "gpt-4o-mini")
 model = OpenAIModel(llm)
 # model = GeminiModel('gemini-2.0-flash')
+
 
 @dataclass
 class PydanticAIDeps:

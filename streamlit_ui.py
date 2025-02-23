@@ -33,12 +33,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-openai_client = AsyncOpenAI()
-supabase: Client = Client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY"))
 
-# Configure logfire to suppress warnings (optional)
-logfire.configure()
-logfire.instrument_httpx(capture_all=True)
+@st.cache_resource
+def init_openai_client():
+    """Initialise the OpenAI client."""
+    print("Initialising openai_client...")
+    return AsyncOpenAI()
+
+
+@st.cache_resource
+def init_supabase():
+    """Initialise the Supabase client."""
+    print("Initialising supabase...")
+    return Client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY"))
+
+
+@st.cache_resource
+def init_logging():
+    """Initialise logging."""
+    print("Initialising logging...")
+    logfire.configure()
+    logfire.instrument_openai()
+    logfire.instrument_httpx(capture_all=True)
+
+
+def init_stuff():
+    """Initialise all the things."""
+    print("Initialising STUFF...")
+    init_openai_client()
+    init_logging()
+    init_supabase()
 
 
 class ChatMessage(TypedDict):
@@ -75,7 +99,7 @@ async def run_agent_with_streaming(user_input: str):
     while maintaining the entire conversation in `st.session_state.messages`.
     """
     # Prepare dependencies
-    deps = PydanticAIDeps(supabase=supabase, openai_client=openai_client)
+    deps = PydanticAIDeps(supabase=init_supabase(), openai_client=init_openai_client())
 
     # Clear placeholder and indicate that we're searching
     message_placeholder = st.empty()
@@ -120,7 +144,9 @@ def is_password_invalid(password: str) -> bool:
 
 async def main():
     """Main function to run the Streamlit UI."""
+    # set_page_config must be the first call in the script
     st.set_page_config(page_title="🔎 GP Connect Chat", page_icon="🏥")
+    init_stuff()
     st.title("🔎 GP Connect Chat")
     st.write("Chat about GP Connect Access Record Structured")
     with st.sidebar:
