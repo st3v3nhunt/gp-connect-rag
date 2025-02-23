@@ -14,9 +14,9 @@
 
 - [X] Deploy to Streamlit cloud
 - [X] Add logfire logging
+- [X] Include links to the page in message response to user
 - [ ] Figure out why the first request to completions is returning an exception. Looks like it is because the event loop
   has been closed - why is this happening?
-- [ ] Include links to the page in message response to user
 - [ ] Handle errors, general non-happy path stuff
   - [ ] Context length of content is too large to create embedding for
     [FHIR implementation](https://developer.nhs.uk/apis/gpconnect-1-6-0/development_fhir_api_guidance.html) and
@@ -32,3 +32,5 @@
 - [ ] Generate a description based on the content rather than using the one from the page as they are all the same
 - [ ] Add progress information to the crawl e.g. X out of Y URLs have been processed
 - [ ] Try a different model e.g. Gemini Flash 2.0
+  - Easy enough to use a different model for the LLM, however, seems to be an error with the connectivity where the
+    connection isn't being closed correctly
