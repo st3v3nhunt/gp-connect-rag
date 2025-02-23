@@ -65,14 +65,6 @@ def init_stuff():
     init_supabase()
 
 
-class ChatMessage(TypedDict):
-    """Format of messages sent to the browser/API."""
-
-    role: Literal["user", "model"]
-    timestamp: str
-    content: str
-
-
 def display_message_part(part):
     """
     Display a single part of a message in the Streamlit UI.
