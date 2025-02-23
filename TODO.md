@@ -15,6 +15,9 @@
 - [X] Deploy to Streamlit cloud
 - [X] Add logfire logging
 - [X] Include links to the page in message response to user
+- [ ] Remove the OGL from the content
+- [ ] Recreate emdeddings for all pages
+- [ ] Consider how to deal with case sensitivity in content and presentation
 - [ ] Figure out why the first request to completions is returning an exception. Looks like it is because the event loop
   has been closed - why is this happening?
 - [ ] Handle errors, general non-happy path stuff
