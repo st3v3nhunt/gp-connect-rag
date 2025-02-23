@@ -3,15 +3,15 @@ UI for the GP Connect Expert chatbot.
 """
 
 from __future__ import annotations
-from typing import Literal, TypedDict
+
 import asyncio
-import json
 import os
 
-import streamlit as st
 import logfire
-from supabase import Client
+import streamlit as st
+from dotenv import load_dotenv
 from openai import AsyncOpenAI
+from supabase import Client
 
 # Import all the message part classes
 from pydantic_ai.messages import (
@@ -28,23 +28,20 @@ from pydantic_ai.messages import (
 )
 from gp_connect_agent import gp_connect_agent, PydanticAIDeps
 
-# Load environment variables
-from dotenv import load_dotenv
-
 load_dotenv()
 
 
 @st.cache_resource
 def init_openai_client():
     """Initialise the OpenAI client."""
-    print("Initialising openai_client...")
+    print("Initialising OpenAI client...")
     return AsyncOpenAI()
 
 
 @st.cache_resource
 def init_supabase():
     """Initialise the Supabase client."""
-    print("Initialising supabase...")
+    print("Initialising Supabase client...")
     return Client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY"))
 
 
@@ -57,11 +54,12 @@ def init_logging():
     logfire.instrument_httpx(capture_all=True)
 
 
+@st.cache_resource
 def init_stuff():
     """Initialise all the things."""
-    print("Initialising STUFF...")
-    init_openai_client()
+    print("Initialising all the things...")
     init_logging()
+    init_openai_client()
     init_supabase()
 
 
@@ -71,15 +69,12 @@ def display_message_part(part):
     Customize how you display system prompts, user prompts,
     tool calls, tool returns, etc.
     """
-    # system-prompt
     if part.part_kind == "system-prompt":
         with st.chat_message("system"):
             st.markdown(f"**System**: {part.content}")
-    # user-prompt
     elif part.part_kind == "user-prompt":
         with st.chat_message("user", avatar="😃"):
             st.markdown(part.content)
-    # text
     elif part.part_kind == "text":
         with st.chat_message("assistant", avatar="🤖"):
             st.markdown(part.content)
@@ -87,8 +82,8 @@ def display_message_part(part):
 
 async def run_agent_with_streaming(user_input: str):
     """
-    Run the agent with streaming text for the user_input prompt,
-    while maintaining the entire conversation in `st.session_state.messages`.
+    Run the agent with streaming text for the user_input prompt.
+    Maintain the entire conversation in `st.session_state.messages`.
     """
     # Prepare dependencies
     deps = PydanticAIDeps(supabase=init_supabase(), openai_client=init_openai_client())
@@ -96,6 +91,7 @@ async def run_agent_with_streaming(user_input: str):
     # Clear placeholder and indicate that we're searching
     message_placeholder = st.empty()
     message_placeholder.status("Searching for answer...")
+
     # Run the agent in a stream
     async with gp_connect_agent.run_stream(
         user_input,
@@ -103,7 +99,7 @@ async def run_agent_with_streaming(user_input: str):
         # pass entire conversation so far
         message_history=st.session_state.messages[:-1],
     ) as result:
-        # We'll gather partial text to show incrementally
+        # Gather partial text to show incrementally
         partial_text = ""
 
         # Render partial text as it arrives
@@ -151,8 +147,7 @@ async def main():
         [View the source code](https://github.com/st3v3nhunt/gp-connect-rag/blob/main/streamlit_ui.py)
         """
 
-    # Make it clear the password is required, stop rendering the UI if not
-    # valid, prevents further checks
+    # Make it clear the password is required, stop rendering the UI if not,
     if is_password_invalid(password):
         st.error("Please enter the password to continue.")
         st.stop()
@@ -160,13 +155,13 @@ async def main():
     # Initialize chat history in session state if not present
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        # st.session_state.messages.append(
-        #     ModelResponse(parts=[TextPart(content="Hi! How can I help you?")])
-        # )
+        st.session_state.messages.append(
+            ModelResponse(parts=[TextPart(content="Hi! How can I help you?")])
+        )
 
-    # Display all messages from the conversation so far
+    # Display all messages from the conversation so far.
     # Each message is either a ModelRequest or ModelResponse.
-    # We iterate over their parts to decide how to display them.
+    # Iterate over their parts to decide how to display them.
     for msg in st.session_state.messages:
         if isinstance(msg, (ModelRequest, ModelResponse)):
             for part in msg.parts:
